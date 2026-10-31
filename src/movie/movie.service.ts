@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -30,7 +30,16 @@ export class MovieService {
   }
 
   async create(createMovieDto: CreateMovieDto) {
+    const existingMovie = await this.movieRepository.findOne({
+      where: { name: createMovieDto.name },
+    });
+  
+    if (existingMovie) {
+      throw new ConflictException('Movie name already exists');
+    }
+  
     const movie = this.movieRepository.create(createMovieDto);
+  
     return this.movieRepository.save(movie);
   }
 

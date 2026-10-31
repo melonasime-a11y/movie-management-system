@@ -6,6 +6,7 @@ import { createObserveModule } from '@nestjs/observe';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MovieModule } from './movie/movie.module';
+import { UserModule } from './user/user.module';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -29,6 +30,8 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     }),
 
     MovieModule,
+
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
