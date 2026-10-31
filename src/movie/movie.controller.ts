@@ -12,11 +12,15 @@ import {
   import { MovieService } from './movie.service';
   import { CreateMovieDto } from './dto/create-movie.dto';
   import { UpdateMovieDto } from './dto/update-movie.dto';
-  
+  import { UseGuards } from '@nestjs/common';
+  import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+
   @Controller('movie')
   export class MovieController {
     constructor(private readonly movieService: MovieService) {}
-  
+    
+    @UseGuards(JwtAuthGuard)
+
     @Get()
     findAll() {
       return this.movieService.findAll();
