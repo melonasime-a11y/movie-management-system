@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_FILTER } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { createObserveModule } from '@nestjs/observe';
@@ -8,6 +9,7 @@ import { AppService } from './app.service';
 import { MovieModule } from './movie/movie.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { DomainErrorFilter } from './shared/presentation/filters/domain-error.filter';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -37,6 +39,6 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, { provide: APP_FILTER, useClass: DomainErrorFilter }],
 })
 export class AppModule {}
