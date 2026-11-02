@@ -2,6 +2,7 @@ import {
   ArgumentsHost,
   Catch,
   ConflictException,
+  ForbiddenException,
   HttpException,
   NotFoundException,
   UnauthorizedException,
@@ -12,6 +13,7 @@ import {
   AuthenticationError,
   ConflictError,
   DomainError,
+  ForbiddenError,
   NotFoundError,
 } from '../../domain/errors';
 
@@ -30,6 +32,9 @@ export class DomainErrorFilter extends BaseExceptionFilter {
     }
     if (error instanceof AuthenticationError) {
       return new UnauthorizedException(error.message);
+    }
+    if (error instanceof ForbiddenError) {
+      return new ForbiddenException(error.message);
     }
     return undefined;
   }

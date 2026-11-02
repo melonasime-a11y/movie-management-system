@@ -28,5 +28,6 @@ import { SessionController } from './presentation/controllers/session.controller
     UpdateSessionUseCase,
     DeleteSessionUseCase,
   ],
+  exports: [SESSION_REPOSITORY],
 })
 export class SessionModule {}

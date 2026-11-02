@@ -96,7 +96,7 @@ describe('SessionController authorization (HTTP)', () => {
     overrides: Partial<typeof validBody> = {},
   ) {
     const res = await http()
-      .post('/session')
+      .post('/sessions')
       .set(auth(managerToken))
       .send({ ...validBody, ...overrides })
       .expect(201);
@@ -105,11 +105,11 @@ describe('SessionController authorization (HTTP)', () => {
 
   describe('without a JWT', () => {
     it.each([
-      ['get', '/session'],
-      ['get', '/session/1'],
-      ['post', '/session'],
-      ['patch', '/session/1'],
-      ['delete', '/session/1'],
+      ['get', '/sessions'],
+      ['get', '/sessions/1'],
+      ['post', '/sessions'],
+      ['patch', '/sessions/1'],
+      ['delete', '/sessions/1'],
     ] as const)('%s %s returns 401', async (method, path) => {
       await http()[method](path).expect(401);
     });
@@ -119,9 +119,9 @@ describe('SessionController authorization (HTTP)', () => {
     it('can list and read sessions', async () => {
       const session = await seedSession();
 
-      await http().get('/session').set(auth(customerToken)).expect(200);
+      await http().get('/sessions').set(auth(customerToken)).expect(200);
       await http()
-        .get(`/session/${session.id}`)
+        .get(`/sessions/${session.id}`)
         .set(auth(customerToken))
         .expect(200);
     });
@@ -130,7 +130,7 @@ describe('SessionController authorization (HTTP)', () => {
       const session = await seedSession();
 
       await http()
-        .post('/session')
+        .post('/sessions')
         .set(auth(customerToken))
         .send({
           ...validBody,
@@ -138,17 +138,17 @@ describe('SessionController authorization (HTTP)', () => {
         })
         .expect(403);
       await http()
-        .patch(`/session/${session.id}`)
+        .patch(`/sessions/${session.id}`)
         .set(auth(customerToken))
         .send({ roomNumber: 2 })
         .expect(403);
       await http()
-        .delete(`/session/${session.id}`)
+        .delete(`/sessions/${session.id}`)
         .set(auth(customerToken))
         .expect(403);
 
       const res = await http()
-        .get(`/session/${session.id}`)
+        .get(`/sessions/${session.id}`)
         .set(auth(customerToken))
         .expect(200);
       expect(res.body).toMatchObject({ roomNumber: 1 });
@@ -160,7 +160,7 @@ describe('SessionController authorization (HTTP)', () => {
       const session = await seedSession();
 
       await http()
-        .patch(`/session/${session.id}`)
+        .patch(`/sessions/${session.id}`)
         .set(auth(managerToken))
         .send({ roomNumber: 2 })
         .expect(200)
@@ -172,11 +172,11 @@ describe('SessionController authorization (HTTP)', () => {
           }),
         );
       await http()
-        .delete(`/session/${session.id}`)
+        .delete(`/sessions/${session.id}`)
         .set(auth(managerToken))
         .expect(200);
       await http()
-        .get(`/session/${session.id}`)
+        .get(`/sessions/${session.id}`)
         .set(auth(managerToken))
         .expect(404);
     });
@@ -185,7 +185,7 @@ describe('SessionController authorization (HTTP)', () => {
       await seedSession();
 
       await http()
-        .post('/session')
+        .post('/sessions')
         .set(auth(managerToken))
         .send(validBody)
         .expect(409, {
@@ -197,7 +197,7 @@ describe('SessionController authorization (HTTP)', () => {
 
     it('gets 404 when the movie does not exist', async () => {
       await http()
-        .post('/session')
+        .post('/sessions')
         .set(auth(managerToken))
         .send({ ...validBody, movieId: 999 })
         .expect(404, {
@@ -209,7 +209,7 @@ describe('SessionController authorization (HTTP)', () => {
 
     it('gets 404 when updating a session that does not exist', async () => {
       await http()
-        .patch('/session/999')
+        .patch('/sessions/999')
         .set(auth(managerToken))
         .send({ roomNumber: 2 })
         .expect(404, {
@@ -221,17 +221,17 @@ describe('SessionController authorization (HTTP)', () => {
 
     it('rejects invalid time slots and room numbers', async () => {
       await http()
-        .post('/session')
+        .post('/sessions')
         .set(auth(managerToken))
         .send({ ...validBody, timeSlot: '09-11' })
         .expect(400);
       await http()
-        .post('/session')
+        .post('/sessions')
         .set(auth(managerToken))
         .send({ ...validBody, roomNumber: 0 })
         .expect(400);
       await http()
-        .post('/session')
+        .post('/sessions')
         .set(auth(managerToken))
         .send({ ...validBody, date: '03-11-2026' })
         .expect(400);

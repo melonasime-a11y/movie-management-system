@@ -10,6 +10,7 @@ import { MovieModule } from './movie/movie.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { SessionModule } from './session/session.module';
+import { TicketModule } from './ticket/ticket.module';
 import { DomainErrorFilter } from './shared/presentation/filters/domain-error.filter';
 
 
@@ -41,6 +42,8 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     AuthModule,
 
     SessionModule,
+
+    TicketModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_FILTER, useClass: DomainErrorFilter }],
