@@ -9,7 +9,9 @@ import { AppService } from './app.service';
 import { MovieModule } from './movie/movie.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { SessionModule } from './session/session.module';
 import { DomainErrorFilter } from './shared/presentation/filters/domain-error.filter';
+
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -37,6 +39,8 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     UserModule,
 
     AuthModule,
+
+    SessionModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_FILTER, useClass: DomainErrorFilter }],

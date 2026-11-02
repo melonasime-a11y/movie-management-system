@@ -23,5 +23,7 @@ import { MovieController } from './presentation/controllers/movie.controller';
     UpdateMovieUseCase,
     DeleteMovieUseCase,
   ],
+  exports: [MOVIE_REPOSITORY],
 })
 export class MovieModule {}
+
