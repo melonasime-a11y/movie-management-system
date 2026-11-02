@@ -1,5 +1,5 @@
-import { Module } from '@nestjs/common';
-import { APP_FILTER } from '@nestjs/core';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { createObserveModule } from '@nestjs/observe';
@@ -11,8 +11,9 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { SessionModule } from './session/session.module';
 import { TicketModule } from './ticket/ticket.module';
+import { RequestLoggerMiddleware } from './shared/infrastructure/middleware/request-logger.middleware';
 import { DomainErrorFilter } from './shared/presentation/filters/domain-error.filter';
-
+import { ResponseTimeInterceptor } from './shared/presentation/interceptors/response-time.interceptor';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -46,6 +47,14 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     TicketModule,
   ],
   controllers: [AppController],
-  providers: [AppService, { provide: APP_FILTER, useClass: DomainErrorFilter }],
+  providers: [
+    AppService,
+    { provide: APP_FILTER, useClass: DomainErrorFilter },
+    { provide: APP_INTERCEPTOR, useClass: ResponseTimeInterceptor },
+  ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(RequestLoggerMiddleware).forRoutes('{*path}');
+  }
+}
