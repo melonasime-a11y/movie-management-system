@@ -22,7 +22,7 @@ import { GetSessionByIdUseCase } from '../../application/use-cases/get-session-b
 import { GetSessionsUseCase } from '../../application/use-cases/get-sessions.use-case';
 import { UpdateSessionUseCase } from '../../application/use-cases/update-session.use-case';
 
-@Controller('session')
+@Controller('sessions')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class SessionController {
   constructor(
