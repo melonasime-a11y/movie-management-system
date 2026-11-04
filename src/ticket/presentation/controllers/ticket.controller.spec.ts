@@ -15,6 +15,7 @@ import { MOVIE_REPOSITORY } from '../../../movie/domain/repositories/movie.repos
 import { SessionTimeSlot } from '../../../session/domain/entities/session-time-slot.enum';
 import { Session } from '../../../session/domain/entities/session.entity';
 import { SESSION_REPOSITORY } from '../../../session/domain/repositories/session.repository';
+import { getJwtSecret } from '../../../shared/infrastructure/config/jwt-secret';
 import { DomainErrorFilter } from '../../../shared/presentation/filters/domain-error.filter';
 import { UserRole } from '../../../user/domain/entities/user-role.enum';
 import { User } from '../../../user/domain/entities/user.entity';
@@ -104,7 +105,7 @@ describe('TicketController authorization (HTTP)', () => {
     const moduleRef = await Test.createTestingModule({
       imports: [
         JwtModule.register({
-          secret: process.env.JWT_SECRET || 'development-secret',
+          secret: getJwtSecret(),
         }),
       ],
       controllers: [TicketController],

@@ -11,6 +11,7 @@ import { JwtAuthGuard } from '../../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../auth/guards/roles.guard';
 import { Movie } from '../../../movie/domain/entities/movie.entity';
 import { MOVIE_REPOSITORY } from '../../../movie/domain/repositories/movie.repository';
+import { getJwtSecret } from '../../../shared/infrastructure/config/jwt-secret';
 import { DomainErrorFilter } from '../../../shared/presentation/filters/domain-error.filter';
 import { UserRole } from '../../../user/domain/entities/user-role.enum';
 import { CreateSessionUseCase } from '../../application/use-cases/create-session.use-case';
@@ -37,7 +38,7 @@ describe('SessionController authorization (HTTP)', () => {
     const moduleRef = await Test.createTestingModule({
       imports: [
         JwtModule.register({
-          secret: process.env.JWT_SECRET || 'development-secret',
+          secret: getJwtSecret(),
         }),
       ],
       controllers: [SessionController],

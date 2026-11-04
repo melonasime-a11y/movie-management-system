@@ -8,6 +8,7 @@ import { App } from 'supertest/types';
 import { InMemoryMovieRepository } from '../../../../test/fakes/in-memory-movie.repository';
 import { JwtAuthGuard } from '../../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../auth/guards/roles.guard';
+import { getJwtSecret } from '../../../shared/infrastructure/config/jwt-secret';
 import { DomainErrorFilter } from '../../../shared/presentation/filters/domain-error.filter';
 import { UserRole } from '../../../user/domain/entities/user-role.enum';
 import { CreateMovieUseCase } from '../../application/use-cases/create-movie.use-case';
@@ -26,7 +27,7 @@ describe('MovieController authorization (HTTP)', () => {
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [
-        JwtModule.register({ secret: process.env.JWT_SECRET || 'development-secret' }),
+        JwtModule.register({ secret: getJwtSecret() }),
       ],
       controllers: [MovieController],
       providers: [
