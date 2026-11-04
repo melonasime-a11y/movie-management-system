@@ -62,7 +62,7 @@ describe('MovieController authorization (HTTP)', () => {
 
   async function seedMovie(name = 'Inception') {
     const res = await http()
-      .post('/movie')
+      .post('/movies')
       .set(auth(managerToken))
       .send({ name, ageRestriction: 13 })
       .expect(201);
@@ -71,13 +71,25 @@ describe('MovieController authorization (HTTP)', () => {
 
   describe('without a JWT', () => {
     it.each([
+      ['get', '/movies'],
+      ['get', '/movies/1'],
+      ['post', '/movies'],
+      ['patch', '/movies/1'],
+      ['delete', '/movies/1'],
+    ] as const)('%s %s returns 401', async (method, path) => {
+      await http()[method](path).expect(401);
+    });
+  });
+
+  describe('legacy singular route', () => {
+    it.each([
       ['get', '/movie'],
       ['get', '/movie/1'],
       ['post', '/movie'],
       ['patch', '/movie/1'],
       ['delete', '/movie/1'],
-    ] as const)('%s %s returns 401', async (method, path) => {
-      await http()[method](path).expect(401);
+    ] as const)('%s %s is no longer mapped (404)', async (method, path) => {
+      await http()[method](path).set(auth(managerToken)).expect(404);
     });
   });
 
@@ -85,26 +97,26 @@ describe('MovieController authorization (HTTP)', () => {
     it('can list and read movies', async () => {
       const movie = await seedMovie();
 
-      await http().get('/movie').set(auth(customerToken)).expect(200);
-      await http().get(`/movie/${movie.id}`).set(auth(customerToken)).expect(200);
+      await http().get('/movies').set(auth(customerToken)).expect(200);
+      await http().get(`/movies/${movie.id}`).set(auth(customerToken)).expect(200);
     });
 
     it('is denied create, update and delete with 403', async () => {
       const movie = await seedMovie();
 
       await http()
-        .post('/movie')
+        .post('/movies')
         .set(auth(customerToken))
         .send({ name: 'Alien', ageRestriction: 18 })
         .expect(403);
       await http()
-        .patch(`/movie/${movie.id}`)
+        .patch(`/movies/${movie.id}`)
         .set(auth(customerToken))
         .send({ ageRestriction: 16 })
         .expect(403);
-      await http().delete(`/movie/${movie.id}`).set(auth(customerToken)).expect(403);
+      await http().delete(`/movies/${movie.id}`).set(auth(customerToken)).expect(403);
 
-      const res = await http().get(`/movie/${movie.id}`).set(auth(customerToken)).expect(200);
+      const res = await http().get(`/movies/${movie.id}`).set(auth(customerToken)).expect(200);
       expect(res.body).toMatchObject({ name: 'Inception', ageRestriction: 13 });
     });
   });
@@ -114,13 +126,13 @@ describe('MovieController authorization (HTTP)', () => {
       const movie = await seedMovie();
 
       await http()
-        .patch(`/movie/${movie.id}`)
+        .patch(`/movies/${movie.id}`)
         .set(auth(managerToken))
         .send({ ageRestriction: 16 })
         .expect(200)
         .expect((res) => expect(res.body).toMatchObject({ name: 'Inception', ageRestriction: 16 }));
-      await http().delete(`/movie/${movie.id}`).set(auth(managerToken)).expect(200);
-      await http().get(`/movie/${movie.id}`).set(auth(managerToken)).expect(404);
+      await http().delete(`/movies/${movie.id}`).set(auth(managerToken)).expect(200);
+      await http().get(`/movies/${movie.id}`).set(auth(managerToken)).expect(404);
     });
 
     it('gets 409 when creating or renaming to an existing name', async () => {
@@ -128,12 +140,12 @@ describe('MovieController authorization (HTTP)', () => {
       const alien = await seedMovie('Alien');
 
       await http()
-        .post('/movie')
+        .post('/movies')
         .set(auth(managerToken))
         .send({ name: 'Inception', ageRestriction: 13 })
         .expect(409, { message: 'Movie name already exists', error: 'Conflict', statusCode: 409 });
       await http()
-        .patch(`/movie/${alien.id}`)
+        .patch(`/movies/${alien.id}`)
         .set(auth(managerToken))
         .send({ name: 'Inception' })
         .expect(409, { message: 'Movie name already exists', error: 'Conflict', statusCode: 409 });
@@ -141,7 +153,7 @@ describe('MovieController authorization (HTTP)', () => {
 
     it('gets 404 when updating a movie that does not exist', async () => {
       await http()
-        .patch('/movie/999')
+        .patch('/movies/999')
         .set(auth(managerToken))
         .send({ name: 'Anything' })
         .expect(404, { message: 'Movie with id 999 not found', error: 'Not Found', statusCode: 404 });

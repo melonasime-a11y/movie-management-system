@@ -31,7 +31,7 @@ import { UpdateMovieUseCase } from '../../application/use-cases/update-movie.use
 
 @ApiTags('movies')
 @ApiBearerAuth()
-@Controller('movie')
+@Controller('movies')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class MovieController {
   constructor(
